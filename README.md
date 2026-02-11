@@ -247,6 +247,17 @@ MIT License - see LICENSE file for details
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
----
+## Output
+<img width="1920" height="1080" alt="Landing_Page" src="https://github.com/user-attachments/assets/9aaf77c9-e3ec-4ec6-8c81-d881ffdcb01b" />
 
-**Built with ❤️ using React, Node.js, and MongoDB**
+<img width="1920" height="1080" alt="Signin" src="https://github.com/user-attachments/assets/63ef99d4-37eb-41a6-a32a-54cff26f34fd" />
+
+<img width="1920" height="1020" alt="Dashboard" src="https://github.com/user-attachments/assets/5ccb2c48-da66-4c7f-b4ba-fdc578901708" />
+
+<img width="1920" height="1080" alt="Goal Setter" src="https://github.com/user-attachments/assets/b5c1c078-56e5-4e91-a6d3-4c39ca4f318c" />
+
+<img width="1920" height="1080" alt="Analysis" src="https://github.com/user-attachments/assets/42448db0-61cb-4b41-b9c6-5e224ebb4a8f" />
+<img width="1920" height="1080" alt="Reports" src="https://github.com/user-attachments/assets/99ed704f-fcdb-4672-94fe-f0861ef318b5" />
+
+<img width="1920" height="1080" alt="Settings" src="https://github.com/user-attachments/assets/5b46b5ef-1d58-4511-835d-556a07ca87c0" />
+

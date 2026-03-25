@@ -247,6 +247,174 @@ MIT License - see LICENSE file for details
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+# Program
+# AI Suggestion Engine (Smart Financial Advisor)
+```
+const getAISuggestion = (goal) => {
+  const progress = (goal.current / goal.target) * 100;
+  const remaining = goal.target - goal.current;
+  const months = parseTimePeriod(goal.timeLeft);
+  const analysis = getSpendingAnalysis();
+  
+  const monthlyNeeded = Math.round(remaining / months);
+
+  // Check if there's increased spending to reduce
+  if (analysis.increasedSpending.length > 0) {
+    const topIncrease = analysis.increasedSpending[0];
+    const potentialSavings = topIncrease.increase;
+    
+    return `💡 You spent ₹${topIncrease.increase.toLocaleString()} more on ${topIncrease.category} this month (${topIncrease.percentIncrease}% increase). Reducing this could help you reach "${goal.name}" faster!`;
+  }
+
+  // Top spending category advice
+  if (analysis.topCategories.length > 0) {
+   const topCategory = analysis.topCategories[0];
+    const potentialMonthlySavings = Math.round(topCategory[1] * 0.2);   
+    return `📊 Your top expense is ${topCategory[0]} at ₹${topCategory[1].toLocaleString()}/month. Cut 20% to save ₹${potentialMonthlySavings.toLocaleString()}/month × ${months} months = ₹${(potentialMonthlySavings * months).toLocaleString()} towards "${goal.name}"!`;
+  }
+
+  return `🎯 Save ₹${monthlyNeeded.toLocaleString()}/month for ${months} months to reach ₹${goal.target.toLocaleString()}. Start today!`;
+}; 
+```
+# Spending Analysis by Category
+```
+const getSpendingAnalysis = () => {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+
+  // Current month expenses by category
+  const currentMonthExpenses = transactions.filter(t => {
+    const date = new Date(t.date);
+    return t.type === 'expense' && date.getMonth() === currentMonth;
+  });
+    // Group by category
+  const groupByCategory = (txns) => {
+    return txns.reduce((acc, t) => {
+      acc[t.category] = (acc[t.category] || 0) + parseFloat(t.amount);
+      return acc;
+    }, {});
+  };
+
+  const currentByCategory = groupByCategory(currentMonthExpenses);
+  
+  // Find categories with increased spending
+  const increasedSpending = [];
+  Object.keys(currentByCategory).forEach(category => {
+    const current = currentByCategory[category];
+    const last = lastByCategory[category] || 0;
+    if (current > last && last > 0) {
+      increasedSpending.push({
+        category,
+        increase: current - last,
+        percentIncrease: Math.round(((current - last) / last) * 100)
+      });
+    }
+ });
+  return { increasedSpending, topCategories, savingsRate };
+};
+```
+# Google OAuth Authentication
+```
+// Frontend - Auth.js
+const handleGoogleLogin = useGoogleLogin({
+  onSuccess: async (tokenResponse) => {
+    const res = await fetch('http://localhost:5000/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: tokenResponse.access_token })
+    });
+    const data = await res.json();
+    localStorage.setItem('user', JSON.stringify(data.user));
+    navigate('/dashboard');
+  }
+});
+// Backend - server.js
+app.post('/api/auth/google', async (req, res) => {
+  const { token } = req.body;
+  const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
+  const userInfo = await response.json();
+  
+  let user = await User.findOne({ email: userInfo.email });
+  if (!user) {
+    user = new User({ name: userInfo.name, email: userInfo.email });
+    await user.save();
+  }
+  res.json({ user });
+});
+```
+# Dynamic Income/Expense Calculation
+```
+const calculateTotals = () => {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const monthlyTransactions = transactions.filter(t => {
+    const date = new Date(t.date);
+    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+  });
+  
+  const monthlyIncome = monthlyTransactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  const monthlyExpense = monthlyTransactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  
+  const balance = totalIncome - totalExpense;
+  
+  return { monthlyIncome, monthlyExpense, balance };
+};
+```
+# Goal Progress Tracking
+```
+const handleAddToGoal = (goalId, amount) => {
+  setGoals(goals.map(g => {
+   if (g.id === goalId) {
+      const newCurrent = g.current + amount;
+      return {
+        ...g,
+        current: newCurrent,
+        completed: newCurrent >= g.target,
+        timeLeft: newCurrent >= g.target ? 'Completed' : g.timeLeft
+      };
+    }
+    return g;
+  }));
+};
+
+// Progress visualization
+const progress = (goal.current / goal.target) * 100;
+<div style={{ width: `${Math.min(progress, 100)}%`, background: 'linear-gradient(90deg, #8B5CF6, #22c55e)' }} />
+```
+# User-Specific Data Persistence (LocalStorage)
+```
+// Load user-specific data
+useEffect(() => {
+  const userData = localStorage.getItem('user');
+  const parsedUser = JSON.parse(userData);
+  setUser(parsedUser);
+  // Each user has their own data key
+  const userDataKey = `goalArc_${parsedUser.email}`;
+  const savedData = localStorage.getItem(userDataKey);
+  if (savedData) {
+    const { goals, transactions } = JSON.parse(savedData);
+    setGoals(goals || []);
+    setTransactions(transactions || []);
+  }
+}, []);
+
+// Auto-save on changes
+useEffect(() => {
+  if (user) {
+    const userDataKey = `goalArc_${user.email}`;
+    localStorage.setItem(userDataKey, JSON.stringify({ goals, transactions }));
+  }
+}, [goals, transactions, user]);
+
+```
+
 ## Output
 <img width="1920" height="1080" alt="Landing_Page" src="https://github.com/user-attachments/assets/9aaf77c9-e3ec-4ec6-8c81-d881ffdcb01b" />
 
